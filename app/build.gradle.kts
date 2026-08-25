@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,6 +7,19 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+
+    if (file.exists()) {
+        file.inputStream().use(::load)
+    }
+}
+
+val gameBrainApiKey =
+    localProperties.getProperty("api_key") ?: ""
+
+val gameBrainApiUrl =
+    localProperties.getProperty("api_url") ?: ""
 
 android {
     namespace = "com.project.gamehub"
@@ -22,6 +37,18 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "gamebrain_api_url",
+            "\"$gameBrainApiUrl\""
+        )
+
+        buildConfigField(
+            "String",
+            "gamebrain_api_key",
+            "\"$gameBrainApiKey\""
+        )
     }
 
     buildTypes {
@@ -39,6 +66,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -57,6 +85,7 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended.android)
 
     // Navigation 3
     implementation(libs.androidx.navigation3.runtime)
@@ -66,6 +95,7 @@ dependencies {
 
     // DI: Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     ksp(libs.hilt.android.compiler)
 
     // Data: Room
@@ -91,4 +121,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
+    // Картинки coil
+    implementation(libs.coil3.coil.compose)
 }
