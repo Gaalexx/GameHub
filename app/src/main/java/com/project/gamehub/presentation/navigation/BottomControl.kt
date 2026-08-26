@@ -32,7 +32,7 @@ fun BottomControl(
     Surface(
         modifier = modifier
             .padding(10.dp),
-        color = MaterialTheme.colorScheme.tertiary,
+        color = MaterialTheme.colorScheme.primary,
         shape = RoundedCornerShape(25.dp)
     ) {
         Row(
@@ -45,8 +45,7 @@ fun BottomControl(
             ) {
                 IconButton(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = if(curPage is ScreenTypes.MainScreen) { {} } else onGoToSearch,
-                    enabled = curPage is ScreenTypes.MainScreen
+                    onClick = if(curPage is ScreenTypes.MainScreen) { {} } else onGoToSearch
                 ) {
                     Icon(
                         imageVector = Icons.Default.Search,
@@ -60,8 +59,7 @@ fun BottomControl(
             ) {
                 IconButton(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = if(curPage is ScreenTypes.MyLibrary) { {} } else onGoToLibrary,
-                    enabled = curPage is ScreenTypes.MyLibrary
+                    onClick = if(curPage is ScreenTypes.MyLibrary) { {} } else onGoToLibrary
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocalLibrary,

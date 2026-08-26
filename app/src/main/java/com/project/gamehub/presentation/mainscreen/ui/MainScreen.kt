@@ -51,7 +51,7 @@ fun MainScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.1f),
-            color = MaterialTheme.colorScheme.tertiary
+            color = MaterialTheme.colorScheme.primary
         ) {
             Row(
                 modifier = Modifier.fillMaxSize()

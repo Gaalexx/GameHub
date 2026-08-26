@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -60,10 +63,23 @@ fun Card(
                     }
                 )
             }
-            Text(
-                text = game.name,
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.2f)
+                    .padding(2.dp)
+                    .clip(RoundedCornerShape(25.dp))
+                    .background(Color.Black.copy(alpha = 0.75f))
+                    .align(Alignment.BottomCenter),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = game.name,
+                    color = Color.White,
+                    maxLines = 1
+                )
+            }
+
         }
     }
 }
