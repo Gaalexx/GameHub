@@ -1,5 +1,6 @@
 package com.project.gamehub.presentation.mainscreen.ui
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberOverscrollEffect
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,16 +21,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.project.gamehub.domain.model.Game
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
 
 @Composable
@@ -47,13 +45,19 @@ fun Card(
         color = MaterialTheme.colorScheme.primaryContainer
     ) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.Transparent)
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
         ) {
             if (game.photoUrl != null) {
                 AsyncImage(
                     modifier = Modifier.fillMaxSize(),
                     model = game.photoUrl,
-                    contentDescription = game.name
+                    contentDescription = game.name,
+                    contentScale = ContentScale.Crop,
+                    onError = { it ->
+                        Log.e("IMAGE", "ERROR ${it.result.throwable.message}")
+                    }
                 )
             }
             Text(

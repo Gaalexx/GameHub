@@ -1,5 +1,6 @@
 package com.project.gamehub.presentation.mainscreen.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.gamehub.domain.repository.GameRepository
@@ -15,6 +16,9 @@ import kotlinx.coroutines.launch
 class MainScreenViewModel @Inject constructor(
     private val repo: GameRepository
 ) : ViewModel(){
+    companion object{
+        const val TAG = "MainScreenViewModel"
+    }
     private val _state = MutableStateFlow<MainViewModelState>(MainViewModelState(gamesList = emptyList()))
     val state = _state.asStateFlow()
 
@@ -26,16 +30,22 @@ class MainScreenViewModel @Inject constructor(
 
     private fun getGames(){
         viewModelScope.launch {
-            val games = repo.getGames(_state.value.pages + 1)
+            val result = repo.getGames(_state.value.pages + 1)
 
-            // TODO обработать ошибки
-
-            _state.update { // случай успеха
-                it.copy(
-                    gamesList = games,
-                    pages = _state.value.pages + 1
-                )
+            if(result.isSuccess){
+                val games = result.getOrNull()
+                _state.update {
+                    it.copy(
+                        gamesList = it.gamesList + (games ?: listOf()),
+                        pages = _state.value.pages + 1
+                    )
+                }
+            }
+            else{
+                // TODO обработать ошибки
+                Log.e(TAG, "getGames exception: ${result.exceptionOrNull()?.message}")
             }
         }
+
     }
 }

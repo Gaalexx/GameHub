@@ -23,11 +23,7 @@ val gameBrainApiUrl =
 
 android {
     namespace = "com.project.gamehub"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.project.gamehub"
@@ -108,6 +104,8 @@ dependencies {
     // Корутины и сериализация
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization)
 
     // Инструменты разработки
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -124,4 +122,5 @@ dependencies {
 
     // Картинки coil
     implementation(libs.coil3.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }

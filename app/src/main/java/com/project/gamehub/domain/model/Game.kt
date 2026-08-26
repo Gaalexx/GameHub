@@ -5,9 +5,8 @@ import kotlin.random.Random
 
 @Immutable
 data class Game(
-    val gameId: Int = 0,
+    val gameId: String,
     val name: String = "name $gameId",
     val description: String = name,
-    val rating: Float = Random.nextFloat().coerceIn(0f, 10f),
     val photoUrl: String? = null
 )
