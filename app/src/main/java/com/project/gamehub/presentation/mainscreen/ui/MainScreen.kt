@@ -1,5 +1,6 @@
 package com.project.gamehub.presentation.mainscreen.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,13 +12,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.project.gamehub.R
 import com.project.gamehub.domain.model.Game
-import com.project.gamehub.presentation.mainscreen.state.MainViewModelState
+import com.project.gamehub.presentation.mainscreen.state.MainScreenViewModelState
+import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenEvent
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
-import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelEvent
+import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelCommand
+import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelError
 import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
@@ -27,9 +33,23 @@ fun MainScreenRoot(
 
     val state = mainScreenViewModel.state.collectAsStateWithLifecycle().value
     val onEvent = mainScreenViewModel::onEvent
+    val context = LocalContext.current
+
+    val noInternetMessage = stringResource(R.string.no_internet_error)
+
 
     LaunchedEffect(Unit) {
-        onEvent(MainScreenViewModelEvent.GetGames)
+        onEvent(MainScreenViewModelCommand.GetGames)
+    }
+
+    LaunchedEffect(Unit) {
+        mainScreenViewModel.event.collect { event ->
+            when (event) {
+                is MainScreenEvent -> {
+                    Toast.makeText(context, noInternetMessage, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
     }
 
     MainScreen(
@@ -39,7 +59,8 @@ fun MainScreenRoot(
 
 @Composable
 fun MainScreen(
-    mainViewModelState: MainViewModelState, onEvent: (MainScreenViewModelEvent) -> Unit
+    mainViewModelState: MainScreenViewModelState,
+    onEvent: (MainScreenViewModelCommand) -> Unit
 ) {
 
     Column(
@@ -60,13 +81,36 @@ fun MainScreen(
             }
         }
 
-        GamesGrid(
-            modifier = Modifier
-                .fillMaxSize(),
-            games = mainViewModelState.gamesList,
-            onLoadMore = {
-                onEvent(MainScreenViewModelEvent.GetGames)
-            })
+        when (mainViewModelState.error) {
+            is MainScreenViewModelError.NoError -> {
+                GamesGrid(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    games = mainViewModelState.gamesList,
+                    onLoadMore = {
+                        onEvent(MainScreenViewModelCommand.GetGames)
+                    })
+            }
+
+            is MainScreenViewModelError.NoInternet -> {
+                RetryHolder(
+                    modifier = Modifier.fillMaxSize(),
+                    whyRetry = stringResource(R.string.error),
+                    whatReason = stringResource(R.string.no_internet_error),
+                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
+            }
+
+            is MainScreenViewModelError.Unknown -> {
+                RetryHolder(
+                    modifier = Modifier.fillMaxSize(),
+                    whyRetry = stringResource(R.string.error),
+                    whatReason = stringResource(R.string.unknown_error),
+                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
+            }
+        }
+
 
     }
 }
@@ -77,7 +121,7 @@ fun MainScreen(
 fun MainScreenPreview() {
     GameHubTheme {
         MainScreen(
-            MainViewModelState(
+            MainScreenViewModelState(
                 gamesList = listOf(
                     Game(" 3"),
                     Game(" "),

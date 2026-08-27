@@ -1,17 +1,21 @@
 package com.project.gamehub.presentation.mainscreen.viewmodel
 
+import android.net.http.NetworkException
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.gamehub.domain.model.Game
 import com.project.gamehub.domain.repository.GameRepository
-import com.project.gamehub.presentation.mainscreen.state.MainViewModelState
+import com.project.gamehub.presentation.mainscreen.state.MainScreenViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
@@ -21,12 +25,14 @@ class MainScreenViewModel @Inject constructor(
         const val TAG = "MainScreenViewModel"
     }
     private val usedGameIds: HashSet<String> = HashSet()
-    private val _state = MutableStateFlow<MainViewModelState>(MainViewModelState(gamesList = emptyList()))
+    private val _state = MutableStateFlow<MainScreenViewModelState>(MainScreenViewModelState(gamesList = emptyList()))
     val state = _state.asStateFlow()
+    private val _event = MutableSharedFlow<MainScreenEvent>()
+    val event = _event.asSharedFlow()
 
-    fun onEvent(event: MainScreenViewModelEvent){
+    fun onEvent(event: MainScreenViewModelCommand){
         when(event){
-            is MainScreenViewModelEvent.GetGames -> getGames()
+            is MainScreenViewModelCommand.GetGames -> getGames()
         }
     }
 
@@ -49,11 +55,33 @@ class MainScreenViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         gamesList = it.gamesList + list,
-                        pages = _state.value.pages + 1
+                        pages = _state.value.pages + 1,
+                        error = MainScreenViewModelError.NoError
                     )
                 }
             }
             else{
+                when(result.exceptionOrNull()){
+                    is UnknownHostException -> {
+                        if(_state.value.gamesList.isNotEmpty()){
+                            _event.emit(MainScreenEvent.NoInternetToast)
+                        }
+                        else{
+                            _state.update {
+                                it.copy(
+                                    error = MainScreenViewModelError.NoInternet
+                                )
+                            }
+                        }
+                    }
+                    else -> {
+                        _state.update {
+                            it.copy(
+                                error = MainScreenViewModelError.Unknown
+                            )
+                        }
+                    }
+                }
                 // TODO обработать ошибки
                 Log.e(TAG, "getGames exception: ${result.exceptionOrNull()?.message}")
             }
