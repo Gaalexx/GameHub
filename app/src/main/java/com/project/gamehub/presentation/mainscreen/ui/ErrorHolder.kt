@@ -33,7 +33,7 @@ fun RetryHolder(
                 color = MaterialTheme.colorScheme.onPrimary
             )
             Button(onClick = onRetry) {
-                Text("Повторить")
+                Text(stringResource(R.string.repeat))
             }
         }
 

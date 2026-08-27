@@ -88,6 +88,7 @@ fun Card(
 @Composable
 fun GamesGrid(
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(),
     games: List<Game> = listOf<Game>(),
     gridScrollState: LazyGridState = rememberLazyGridState(),
     onLoadMore: () -> Unit
@@ -114,7 +115,7 @@ fun GamesGrid(
         columns = GridCells.Fixed(2),
         modifier = modifier,
         state = gridScrollState,
-        contentPadding = PaddingValues(5.dp),
+        contentPadding = contentPadding
     ) {
         itemsIndexed(
             items = games,
