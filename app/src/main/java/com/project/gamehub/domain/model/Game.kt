@@ -7,6 +7,6 @@ import kotlin.random.Random
 data class Game(
     val gameId: String,
     val name: String = "name $gameId",
-    val description: String = name,
+//    val description: String = name,
     val photoUrl: String? = null
 )

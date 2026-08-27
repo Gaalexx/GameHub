@@ -8,12 +8,10 @@ import kotlin.random.Random
 
 @Serializable
 data class GameDTO(
-    @SerialName("id")
+    @SerialName("gameID")
     val gameId: String,
     val title: String,
-    @SerialName("short_description")
-    val description: String? = null,
-    @SerialName("cover_image_url")
+    @SerialName("thumb")
     val photoUrl: String?
 )
 @Serializable

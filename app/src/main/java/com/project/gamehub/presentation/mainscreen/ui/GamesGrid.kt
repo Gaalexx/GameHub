@@ -26,9 +26,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.project.gamehub.domain.model.Game
@@ -69,14 +69,15 @@ fun Card(
                     .fillMaxHeight(0.2f)
                     .padding(2.dp)
                     .clip(RoundedCornerShape(25.dp))
-                    .background(Color.Black.copy(alpha = 0.75f))
+                    .background(Color.Black.copy(alpha = 0.85f))
                     .align(Alignment.BottomCenter),
                 contentAlignment = Alignment.Center
-            ){
+            ) {
                 Text(
                     text = game.name,
                     color = Color.White,
-                    maxLines = 1
+                    maxLines = 1,
+                    textAlign = TextAlign.Center
                 )
             }
 
@@ -98,7 +99,7 @@ fun GamesGrid(
             val lastVisibleIndex =
                 info.visibleItemsInfo.lastOrNull()?.index ?: -1
 
-            lastVisibleIndex >= info.totalItemsCount - 1
+            lastVisibleIndex >= info.totalItemsCount - 4
         }
     }
 

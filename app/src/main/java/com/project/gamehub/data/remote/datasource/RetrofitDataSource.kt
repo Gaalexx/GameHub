@@ -9,13 +9,12 @@ class RetrofitDataSource @Inject constructor(
     private val api: GamesAPIRetrofit
 ) : GamesAPI {
     override suspend fun getGames(
-        query: String,
         limit: Int,
         page: Int
     ): List<GameDTO> {
         return api.getGames(
             limit = limit,
             page = page
-        ).data
+        )
     }
 }

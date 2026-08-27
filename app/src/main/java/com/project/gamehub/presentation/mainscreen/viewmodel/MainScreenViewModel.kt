@@ -3,6 +3,7 @@ package com.project.gamehub.presentation.mainscreen.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.gamehub.domain.model.Game
 import com.project.gamehub.domain.repository.GameRepository
 import com.project.gamehub.presentation.mainscreen.state.MainViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ class MainScreenViewModel @Inject constructor(
     companion object{
         const val TAG = "MainScreenViewModel"
     }
+    private val usedGameIds: HashSet<String> = HashSet()
     private val _state = MutableStateFlow<MainViewModelState>(MainViewModelState(gamesList = emptyList()))
     val state = _state.asStateFlow()
 
@@ -34,9 +36,19 @@ class MainScreenViewModel @Inject constructor(
 
             if(result.isSuccess){
                 val games = result.getOrNull()
+
+                val list: List<Game> = buildList{
+                    games?.forEach { it ->
+                        if(it.gameId !in usedGameIds){
+                            usedGameIds.add(it.gameId)
+                            add(it)
+                        }
+                    } ?: emptyList<Game>()
+                }
+
                 _state.update {
                     it.copy(
-                        gamesList = it.gamesList + (games ?: listOf()),
+                        gamesList = it.gamesList + list,
                         pages = _state.value.pages + 1
                     )
                 }

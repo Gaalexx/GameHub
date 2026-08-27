@@ -11,14 +11,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import javax.inject.Singleton
-import kotlin.jvm.java
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Singleton
 
 
 @Module
@@ -35,11 +33,26 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request()
+                .newBuilder()
+                .header("User-Agent", "GameHub/1.0")
+                .build()
+
+            chain.proceed(request)
+        }
+        .build()
+
+    @Provides
+    @Singleton
     fun provideRetrofit(
+        client: OkHttpClient,
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.gamebrain_api_url)
+            .client(client)
             .addConverterFactory(
                 json.asConverterFactory(
                     "application/json".toMediaType()
@@ -57,11 +70,11 @@ object NetworkModule {
     }
 
 
-
 }
+
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class NetworkAbstractModule{
+abstract class NetworkAbstractModule {
     @Binds
     abstract fun bindGamesAPIImpl(
         impl: RetrofitDataSource

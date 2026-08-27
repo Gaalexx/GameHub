@@ -17,9 +17,8 @@ class GameRepositoryImpl @Inject constructor(
                 dtos.forEach { it ->
                     add(
                         Game(
-                            gameId = it.gameId,
-                            name = it.title,
-                            description = it.description ?: "No description",
+                            gameId = it.gameId, name = it.title,
+                            //description = it.description ?: "No description",
                             photoUrl = it.photoUrl
                         )
                     )

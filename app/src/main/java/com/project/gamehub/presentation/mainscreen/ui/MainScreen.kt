@@ -45,7 +45,7 @@ fun MainScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
+            .background(color = MaterialTheme.colorScheme.secondary)
     ) {
         Surface(
             modifier = Modifier
