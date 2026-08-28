@@ -1,27 +1,50 @@
 package com.project.gamehub.presentation.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.project.gamehub.presentation.mainscreen.MainScreenRoot
+import com.project.gamehub.presentation.library.ui.Library
+import com.project.gamehub.presentation.mainscreen.ui.MainScreenRoot
 
 @Composable
-fun AppNavigation(){
+fun AppNavigation() {
     val navBackStack = rememberNavBackStack(ScreenTypes.MainScreen)
     val navEntryProvider = entryProvider<NavKey> {
         entry<ScreenTypes.MainScreen> {
             MainScreenRoot()
         }
+        entry<ScreenTypes.MyLibrary>{
+            Library()
+        }
     }
+
+    val curPage = navBackStack.lastOrNull()
 
     NavDisplay(
         backStack = navBackStack,
         onBack = { navBackStack.removeLastOrNull() },
         entryProvider = navEntryProvider
     )
+    Box(modifier = Modifier.fillMaxSize()) {
+        BottomControl(
+            modifier = Modifier
+                .align(alignment = Alignment.BottomCenter)
+                .height(100.dp)
+                .fillMaxWidth(0.8f),
+            curPage = curPage as? ScreenTypes ?: ScreenTypes.MainScreen,
+            onGoToSearch = { navBackStack.removeLastOrNull() },
+            onGoToLibrary = { navBackStack.add(ScreenTypes.MyLibrary) })
+    }
+
 
 }
