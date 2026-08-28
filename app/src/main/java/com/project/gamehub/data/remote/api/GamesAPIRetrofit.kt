@@ -13,4 +13,9 @@ interface GamesAPIRetrofit {
         @Query("pageNumber") page: Int = 1,
         @Query("pageSize") limit: Int = 20
     ): List<GameDTO>
+
+    @GET("games")
+    suspend fun getGameById(
+        @Query("") smth: String
+    )
 }

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.gamehub.R
-import com.project.gamehub.domain.model.Game
+import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.presentation.mainscreen.state.MainScreenViewModelState
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenEvent
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
@@ -149,26 +149,26 @@ fun MainScreenPreview() {
         MainScreen(
             MainScreenViewModelState(
                 gamesList = listOf(
-                    Game(" 3"),
-                    Game(" "),
-                    Game("1 "),
-                    Game(" 1"),
-                    Game(" "),
-                    Game(" "),
-                    Game(" 2"),
-                    Game(" "),
-                    Game(" 4"),
-                    Game(" "),
-                    Game(" 1"),
-                    Game(" "),
-                    Game(" "),
-                    Game(" "),
-                    Game("2 "),
-                    Game(" "),
-                    Game("3 "),
-                    Game(" 2"),
-                    Game("3 "),
-                    Game(" 4")
+                    GameShortInfo(" 3"),
+                    GameShortInfo(" "),
+                    GameShortInfo("1 "),
+                    GameShortInfo(" 1"),
+                    GameShortInfo(" "),
+                    GameShortInfo(" "),
+                    GameShortInfo(" 2"),
+                    GameShortInfo(" "),
+                    GameShortInfo(" 4"),
+                    GameShortInfo(" "),
+                    GameShortInfo(" 1"),
+                    GameShortInfo(" "),
+                    GameShortInfo(" "),
+                    GameShortInfo(" "),
+                    GameShortInfo("2 "),
+                    GameShortInfo(" "),
+                    GameShortInfo("3 "),
+                    GameShortInfo(" 2"),
+                    GameShortInfo("3 "),
+                    GameShortInfo(" 4")
                 )
             ), {})
     }

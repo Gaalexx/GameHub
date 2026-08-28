@@ -1,10 +1,9 @@
 package com.project.gamehub.domain.model
 
 import androidx.compose.runtime.Immutable
-import kotlin.random.Random
 
 @Immutable
-data class Game(
+data class GameShortInfo(
     val gameId: String,
     val name: String = "name $gameId",
 //    val description: String = name,

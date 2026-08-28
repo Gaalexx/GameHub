@@ -1,7 +1,8 @@
 package com.project.gamehub.data.repository
 
 import com.project.gamehub.data.remote.GamesAPI
-import com.project.gamehub.domain.model.Game
+import com.project.gamehub.domain.model.GameFullInfo
+import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.domain.repository.GameRepository
 import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
@@ -9,14 +10,14 @@ import javax.inject.Inject
 class GameRepositoryImpl @Inject constructor(
     private val api: GamesAPI
 ) : GameRepository {
-    override suspend fun getGames(page: Int): Result<List<Game>> {
+    override suspend fun getGames(page: Int): Result<List<GameShortInfo>> {
 
         try {
             val dtos = api.getGames(page = page)
             return Result.success(buildList {
                 dtos.forEach { it ->
                     add(
-                        Game(
+                        GameShortInfo(
                             gameId = it.gameId, name = it.title,
                             //description = it.description ?: "No description",
                             photoUrl = it.photoUrl
@@ -31,6 +32,10 @@ class GameRepositoryImpl @Inject constructor(
         }
 
 
+    }
+
+    override suspend fun getGame(page: Int): Result<GameFullInfo> {
+        TODO("Not yet implemented")
     }
 
 }

@@ -31,13 +31,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.project.gamehub.domain.model.Game
+import com.project.gamehub.domain.model.GameShortInfo
 
 
 @Composable
 fun Card(
     modifier: Modifier = Modifier,
-    game: Game
+    game: GameShortInfo
 ) {
     Surface(
         modifier = modifier
@@ -89,7 +89,7 @@ fun Card(
 fun GamesGrid(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    games: List<Game> = listOf<Game>(),
+    games: List<GameShortInfo> = listOf<GameShortInfo>(),
     gridScrollState: LazyGridState = rememberLazyGridState(),
     onLoadMore: () -> Unit
 ) {

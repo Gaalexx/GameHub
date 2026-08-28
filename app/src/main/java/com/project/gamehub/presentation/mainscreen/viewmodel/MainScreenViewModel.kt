@@ -1,10 +1,9 @@
 package com.project.gamehub.presentation.mainscreen.viewmodel
 
-import android.net.http.NetworkException
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.gamehub.domain.model.Game
+import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.domain.repository.GameRepository
 import com.project.gamehub.presentation.mainscreen.state.MainScreenViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,13 +42,13 @@ class MainScreenViewModel @Inject constructor(
             if(result.isSuccess){
                 val games = result.getOrNull()
 
-                val list: List<Game> = buildList{
+                val list: List<GameShortInfo> = buildList{
                     games?.forEach { it ->
                         if(it.gameId !in usedGameIds){
                             usedGameIds.add(it.gameId)
                             add(it)
                         }
-                    } ?: emptyList<Game>()
+                    } ?: emptyList<GameShortInfo>()
                 }
 
                 _state.update {
