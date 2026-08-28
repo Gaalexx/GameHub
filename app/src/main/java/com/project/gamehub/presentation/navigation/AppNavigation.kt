@@ -3,9 +3,12 @@ package com.project.gamehub.presentation.navigation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -36,7 +39,8 @@ fun AppNavigation() {
         BottomControl(
             modifier = Modifier
                 .align(alignment = Alignment.BottomCenter)
-                .fillMaxHeight(0.09f),
+                .height(100.dp)
+                .fillMaxWidth(0.8f),
             curPage = curPage as? ScreenTypes ?: ScreenTypes.MainScreen,
             onGoToSearch = { navBackStack.removeLastOrNull() },
             onGoToLibrary = { navBackStack.add(ScreenTypes.MyLibrary) })

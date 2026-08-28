@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -82,8 +83,7 @@ fun MainScreen(
 ) {
 
     var query by remember { mutableStateOf<String>("") }
-    val focusManager = LocalFocusManager.current
-    var textFieldHeightDp by remember { mutableStateOf(64.dp) }
+    var searchBarBottom by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
 
     Box(
@@ -96,7 +96,7 @@ fun MainScreen(
             is MainScreenViewModelError.NoError -> {
                 GamesGrid(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(top = textFieldHeightDp),
+                    contentPadding = PaddingValues(top = searchBarBottom),
                     games = mainViewModelState.gamesList,
                     onLoadMore = {
                         onEvent(MainScreenViewModelCommand.GetGames)
@@ -110,14 +110,16 @@ fun MainScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight(0.13f)
+                        .align(Alignment.TopCenter)
                         .padding(
                             start = 16.dp,
                             end = 16.dp,
                             top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
                         )
-                        .align(Alignment.TopCenter)
-                        .onGloballyPositioned{ coordinates ->
-                            textFieldHeightDp = (coordinates.positionInWindow().y).dp // TODO додумать как правильно посчитать паддинг, работает некорректно
+                        .onGloballyPositioned { coords ->
+                            val bottomPx = coords.positionInParent().y + coords.size.height
+                            val newValue = with(density) { bottomPx.toDp() }
+                            if (newValue != searchBarBottom) searchBarBottom = newValue
                         },
                     shape = RoundedCornerShape(25.dp)
                 )
@@ -142,17 +144,6 @@ fun MainScreen(
 
 
     }
-
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(color = MaterialTheme.colorScheme.secondary)
-//            //.systemBars
-//    ) {
-//
-//
-//    }
 }
 
 
