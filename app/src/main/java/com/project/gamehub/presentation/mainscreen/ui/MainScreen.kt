@@ -43,6 +43,7 @@ import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
 fun MainScreenRoot(
+    navigateToGame: (String) -> Unit = {},
     mainScreenViewModel: MainScreenViewModel = hiltViewModel()
 ) {
 
@@ -68,13 +69,15 @@ fun MainScreenRoot(
     }
 
     MainScreen(
-        mainViewModelState = state, onEvent = onEvent
+        mainViewModelState = state, onEvent = onEvent, navigateToGame = navigateToGame
     )
 }
 
 @Composable
 fun MainScreen(
-    mainViewModelState: MainScreenViewModelState, onEvent: (MainScreenViewModelCommand) -> Unit
+    mainViewModelState: MainScreenViewModelState,
+    onEvent: (MainScreenViewModelCommand) -> Unit,
+    navigateToGame: (String) -> Unit = {},
 ) {
 
     var query by remember { mutableStateOf<String>("") }
@@ -95,7 +98,9 @@ fun MainScreen(
                     games = mainViewModelState.gamesList,
                     onLoadMore = {
                         onEvent(MainScreenViewModelCommand.GetGames)
-                    })
+                    },
+                    navigateToGame = navigateToGame
+                )
 
 
                 TextField(

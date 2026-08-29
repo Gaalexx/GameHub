@@ -6,4 +6,7 @@
     <string name="repeat">Повторить</string>
     <string name="input_game">Введите игру...</string>
 
+    <string name="description">Описание</string>
+    <string name="price">Цена: %1$s</string>
+    <string name="rating">Рейтинг: %1$f</string>
 </resources>

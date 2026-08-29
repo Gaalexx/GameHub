@@ -1,7 +1,6 @@
 package com.project.gamehub.presentation.navigation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +12,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.project.gamehub.presentation.gamepage.ui.GamePageRoot
 import com.project.gamehub.presentation.library.ui.Library
 import com.project.gamehub.presentation.mainscreen.ui.MainScreenRoot
 
@@ -21,10 +21,16 @@ fun AppNavigation() {
     val navBackStack = rememberNavBackStack(ScreenTypes.MainScreen)
     val navEntryProvider = entryProvider<NavKey> {
         entry<ScreenTypes.MainScreen> {
-            MainScreenRoot()
+            MainScreenRoot(
+                navigateToGame = { it ->
+                    navBackStack.add(ScreenTypes.GameReview(it))
+                })
         }
-        entry<ScreenTypes.MyLibrary>{
+        entry<ScreenTypes.MyLibrary> {
             Library()
+        }
+        entry<ScreenTypes.GameReview> { it ->
+            GamePageRoot(gameId = it.gameId, onBack = { navBackStack.removeLastOrNull() })
         }
     }
 
@@ -35,16 +41,17 @@ fun AppNavigation() {
         onBack = { navBackStack.removeLastOrNull() },
         entryProvider = navEntryProvider
     )
-    Box(modifier = Modifier.fillMaxSize()) {
-        BottomControl(
-            modifier = Modifier
-                .align(alignment = Alignment.BottomCenter)
-                .height(100.dp)
-                .fillMaxWidth(0.8f),
-            curPage = curPage as? ScreenTypes ?: ScreenTypes.MainScreen,
-            onGoToSearch = { navBackStack.removeLastOrNull() },
-            onGoToLibrary = { navBackStack.add(ScreenTypes.MyLibrary) })
+
+    if (navBackStack.last() is ScreenTypes.BottomBarNavigatable) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            BottomControl(
+                modifier = Modifier
+                    .align(alignment = Alignment.BottomCenter)
+                    .height(100.dp)
+                    .fillMaxWidth(0.8f),
+                curPage = curPage as? ScreenTypes ?: ScreenTypes.MainScreen,
+                onGoToSearch = { navBackStack.removeLastOrNull() },
+                onGoToLibrary = { navBackStack.add(ScreenTypes.MyLibrary) })
+        }
     }
-
-
 }
