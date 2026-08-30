@@ -30,7 +30,7 @@ fun AppNavigation() {
             Library()
         }
         entry<ScreenTypes.GameReview> { it ->
-            GamePageRoot(gameId = it.gameId, onBack = { navBackStack.removeLastOrNull() })
+            GamePageRoot(game = it.game, onBack = { navBackStack.removeLastOrNull() })
         }
     }
 

@@ -43,7 +43,7 @@ import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
 fun MainScreenRoot(
-    navigateToGame: (String) -> Unit = {},
+    navigateToGame: (GameShortInfo) -> Unit = {},
     mainScreenViewModel: MainScreenViewModel = hiltViewModel()
 ) {
 
@@ -77,7 +77,7 @@ fun MainScreenRoot(
 fun MainScreen(
     mainViewModelState: MainScreenViewModelState,
     onEvent: (MainScreenViewModelCommand) -> Unit,
-    navigateToGame: (String) -> Unit = {},
+    navigateToGame: (GameShortInfo) -> Unit = {},
 ) {
 
     var query by remember { mutableStateOf<String>("") }

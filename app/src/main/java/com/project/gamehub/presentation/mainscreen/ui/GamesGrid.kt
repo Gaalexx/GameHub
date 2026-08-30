@@ -91,7 +91,7 @@ fun GamesGrid(
     games: List<GameShortInfo> = listOf<GameShortInfo>(),
     gridScrollState: LazyGridState = rememberLazyGridState(),
     onLoadMore: () -> Unit,
-    navigateToGame: (String) -> Unit = {},
+    navigateToGame: (GameShortInfo) -> Unit = {},
 ) {
 
     val shouldLoadMore by remember {
@@ -123,7 +123,11 @@ fun GamesGrid(
         }) { index, item ->
             Card(
                 game = item,
-                onClick = { navigateToGame(item.gameId) }
+                onClick = {
+                    if(item.dealId != null){
+                        navigateToGame(item)
+                    }
+                }
             )
         }
     }

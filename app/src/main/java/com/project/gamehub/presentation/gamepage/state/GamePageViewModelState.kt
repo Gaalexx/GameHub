@@ -5,10 +5,11 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class GamePageViewModelState(
-    val name: String,
+    val name: String = "",
     val photoUrl: String? = null,
-    val rating: Double,
-    val price: String,
-    val description: String,
-    val isInLibrary: Boolean = false
+    val rating: String = "",
+    val price: String = "",
+    val description: String = "",
+    val isInLibrary: Boolean = false,
+    val isLoading: Boolean = true
 )

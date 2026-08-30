@@ -2,6 +2,7 @@ package com.project.gamehub.data.remote.datasource
 
 import com.project.gamehub.data.remote.GamesAPI
 import com.project.gamehub.data.remote.api.CheapSharkAPIRetrofit
+import com.project.gamehub.data.remote.dto.DealDetailsDTO
 import com.project.gamehub.data.remote.dto.GameDTO
 import jakarta.inject.Inject
 
@@ -16,5 +17,9 @@ class RetrofitCheapSharkDataSource @Inject constructor(
             limit = limit,
             page = page
         )
+    }
+
+    override suspend fun getGame(id: String): DealDetailsDTO {
+        return api.getDeal(id)
     }
 }

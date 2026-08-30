@@ -5,5 +5,5 @@ import com.project.gamehub.domain.model.GameShortInfo
 
 interface GameRepository {
     suspend fun getGames(page: Int): Result<List<GameShortInfo>>
-    suspend fun getGameBySteamId(steamGameId: String): Result<GameFullInfo>
+    suspend fun getGame(id: String): Result<GameFullInfo>
 }
