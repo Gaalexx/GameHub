@@ -2,7 +2,6 @@ package com.project.gamehub.presentation.mainscreen.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
@@ -40,18 +39,15 @@ fun Card(
     modifier: Modifier = Modifier, game: GameShortInfo, onClick: () -> Unit = {}
 ) {
     Surface(
+        onClick = onClick,
         modifier = modifier
             .padding(5.dp)
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(
-                onClick = onClick
-            ), shape = RoundedCornerShape(15.dp), color = MaterialTheme.colorScheme.primaryContainer
+            .aspectRatio(1f),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
+            modifier = Modifier.fillMaxSize()
         ) {
             if (game.photoUrl != null) {
                 AsyncImage(
@@ -69,7 +65,7 @@ fun Card(
                     .fillMaxHeight(0.2f)
                     .padding(2.dp)
                     .clip(RoundedCornerShape(25.dp))
-                    .background(Color.Black.copy(alpha = 0.85f))
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.72f))
                     .align(Alignment.BottomCenter), contentAlignment = Alignment.Center
             ) {
                 Text(

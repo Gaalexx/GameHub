@@ -21,10 +21,10 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,6 +47,7 @@ import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.presentation.gamepage.state.GamePageViewModelState
 import com.project.gamehub.presentation.gamepage.viewmodel.GamePageViewModel
 import com.project.gamehub.presentation.gamepage.viewmodel.GamePageViewModelCommand
+import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
 fun GamePageRoot(
@@ -76,8 +77,13 @@ fun GamePage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.background)
-            .systemBarsPadding()
+            .background(color = MaterialTheme.colorScheme.surface)
+    )
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding(),
+        color = MaterialTheme.colorScheme.surface,
     ) {
         Column(
             modifier = Modifier
@@ -98,19 +104,15 @@ fun GamePage(
                         .aspectRatio(1f)
                         .fillMaxHeight()
                 ) {
-                    IconButton(
+                    FilledTonalIconButton(
                         modifier = Modifier
                             .fillMaxSize(0.75f)
                             .aspectRatio(1f)
                             .align(Alignment.Center),
                         onClick = onBack,
-                        colors = IconButtonDefaults.iconButtonColors().copy(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
-                            tint = MaterialTheme.colorScheme.onPrimary,
                             contentDescription = "Back",
                         )
                     }
@@ -127,7 +129,11 @@ fun GamePage(
                             .fillMaxSize(0.65f)
                             .align(Alignment.Center),
                         imageVector = if (state.isInLibrary) Icons.Default.Star else Icons.Default.StarOutline,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = if (state.isInLibrary) {
+                            MaterialTheme.colorScheme.tertiary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                         contentDescription = "Star"
                     )
                 }
@@ -143,7 +149,6 @@ fun GamePage(
                     modifier = Modifier.padding(5.dp),
                     text = state.name,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onBackground
                 )
                 if (state.photoUrl != null) {
                     Box(
@@ -151,7 +156,7 @@ fun GamePage(
                             .fillMaxWidth()
                             .padding(5.dp)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(color = MaterialTheme.colorScheme.secondary)
+                            .background(color = MaterialTheme.colorScheme.surfaceContainerHighest)
                     ) {
                         AsyncImage(
                             modifier = Modifier.fillMaxWidth(),
@@ -170,19 +175,16 @@ fun GamePage(
                         modifier = descTextModifier.weight(1f),
                         text = stringResource(R.string.rating, state.rating),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
                         modifier = descTextModifier.weight(1f),
                         text = stringResource(R.string.price, state.price),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
                     modifier = descTextModifier,
                     text = stringResource(R.string.description),
-                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.titleLarge,
                     textAlign = TextAlign.Center
                 )
@@ -194,7 +196,6 @@ fun GamePage(
                             firstLine =  24.sp
                         )
                     ),
-                    color = MaterialTheme.colorScheme.onBackground,
                 )
 
 
@@ -208,7 +209,7 @@ fun GamePage(
 @Preview
 @Composable
 private fun GamePagePreview() {
-    MaterialTheme {
+    GameHubTheme {
         GamePage(
             state = GamePageViewModelState(
                 "game",
