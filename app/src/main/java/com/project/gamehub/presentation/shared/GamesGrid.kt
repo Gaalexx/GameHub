@@ -1,4 +1,4 @@
-package com.project.gamehub.presentation.mainscreen.ui
+package com.project.gamehub.presentation.shared
 
 import android.util.Log
 import androidx.compose.foundation.background

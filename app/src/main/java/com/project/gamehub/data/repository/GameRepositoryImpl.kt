@@ -1,19 +1,24 @@
 package com.project.gamehub.data.repository
 
-import android.util.Log
+import com.project.gamehub.data.local.dao.SavedGamesDao
+import com.project.gamehub.data.local.entity.GameEntity
 import com.project.gamehub.data.remote.GameInfoAPI
 import com.project.gamehub.data.remote.GamesAPI
 import com.project.gamehub.domain.model.GameFullInfo
 import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.domain.repository.GameRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 
 class NoSuchGameException : Throwable()
 
 class GameRepositoryImpl @Inject constructor(
-    private val api: GamesAPI, private val gameInfoAPI: GameInfoAPI
+    private val api: GamesAPI,
+    private val gameInfoAPI: GameInfoAPI,
+    private val savedGames: SavedGamesDao
 ) : GameRepository {
     override suspend fun getGames(page: Int): Result<List<GameShortInfo>> {
 
@@ -21,7 +26,7 @@ class GameRepositoryImpl @Inject constructor(
             val dtos = api.getGames(limit = 100, page = page)
             return Result.success(buildList {
                 dtos.forEach { it ->
-                    if(it.steamAppId != null){
+                    if (it.steamAppId != null) {
                         add(
                             GameShortInfo(
                                 gameId = it.gameId,
@@ -43,6 +48,11 @@ class GameRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getGame(id: String): Result<GameFullInfo> {
+        val saved = getSavedGameByDealId(id)
+        if (saved != null) {
+            return Result.success(saved)
+        }
+
         try {
             val game = api.getGame(id)
             if (game.gameInfo.steamAppId == null) {
@@ -68,6 +78,54 @@ class GameRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             return Result.failure(e)
         }
+    }
+
+
+    override suspend fun getSavedGamesFull(): Flow<List<GameFullInfo>> {
+        return savedGames.getGames().map { it ->
+            it.map { entity ->
+                entity.toDomain()
+            }
+        }
+    }
+
+    override suspend fun observeSavedGamesShort(): Flow<List<GameShortInfo>> {
+        return savedGames.getGames().map { it ->
+            it.map { game ->
+                GameShortInfo(
+                    gameId = game.steamId,
+                    name = game.name,
+                    photoUrl = game.imageUrl,
+                    dealId = game.dealId
+                )
+            }
+        }
+    }
+
+    override suspend fun getSavedGameByDealId(dealId: String): GameFullInfo? {
+        return savedGames.getGameByDealId(dealId)?.toDomain()?.copy(saved = true)
+    }
+
+    override suspend fun getSavedGameBySteamId(steamId: String): GameFullInfo? {
+        return savedGames.getGameBySteamId(steamId)?.toDomain()?.copy(saved = true)
+    }
+
+    override suspend fun saveGame(game: GameFullInfo, dealId: String) {
+        savedGames.insert(
+            GameEntity(
+                steamId = game.id,
+                dealId = dealId,
+                name = game.name,
+                imageUrl = game.photoUrl,
+                description = game.description,
+                price = game.price,
+                rating = game.rating
+            )
+        )
+    }
+
+    override suspend fun deleteBySteamId(id: String) {
+        savedGames.deleteBySteamId(id)
     }
 
 }

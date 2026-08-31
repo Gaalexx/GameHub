@@ -9,5 +9,6 @@ data class GameFullInfo(
     val description: String,
     val photoUrl: String?,
     val rating: String,
-    val price: String
+    val price: String,
+    val saved: Boolean = false
 )

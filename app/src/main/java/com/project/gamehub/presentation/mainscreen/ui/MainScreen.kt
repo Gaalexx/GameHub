@@ -40,6 +40,7 @@ import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelCommand
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelError
 import com.project.gamehub.presentation.shared.ConnectionErrorScreen
+import com.project.gamehub.presentation.shared.GamesGrid
 import com.project.gamehub.presentation.shared.UnknownErrorScreen
 import com.project.gamehub.presentation.theme.GameHubTheme
 
