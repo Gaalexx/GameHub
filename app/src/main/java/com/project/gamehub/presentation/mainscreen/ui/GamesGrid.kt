@@ -36,21 +36,18 @@ import com.project.gamehub.domain.model.GameShortInfo
 
 @Composable
 fun Card(
-    modifier: Modifier = Modifier,
-    game: GameShortInfo
+    modifier: Modifier = Modifier, game: GameShortInfo, onClick: () -> Unit = {}
 ) {
     Surface(
+        onClick = onClick,
         modifier = modifier
             .padding(5.dp)
-            .aspectRatio(1f)
-            .clip(RoundedCornerShape(8.dp)),
-        shape = RoundedCornerShape(15.dp),
-        color = MaterialTheme.colorScheme.primaryContainer
+            .aspectRatio(1f),
+        shape = RoundedCornerShape(12.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Transparent)
+            modifier = Modifier.fillMaxSize()
         ) {
             if (game.photoUrl != null) {
                 AsyncImage(
@@ -60,8 +57,7 @@ fun Card(
                     contentScale = ContentScale.Crop,
                     onError = { it ->
                         Log.e("IMAGE", "ERROR ${it.result.throwable.message}")
-                    }
-                )
+                    })
             }
             Box(
                 modifier = Modifier
@@ -69,9 +65,8 @@ fun Card(
                     .fillMaxHeight(0.2f)
                     .padding(2.dp)
                     .clip(RoundedCornerShape(25.dp))
-                    .background(Color.Black.copy(alpha = 0.85f))
-                    .align(Alignment.BottomCenter),
-                contentAlignment = Alignment.Center
+                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.72f))
+                    .align(Alignment.BottomCenter), contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = game.name,
@@ -91,14 +86,14 @@ fun GamesGrid(
     contentPadding: PaddingValues = PaddingValues(),
     games: List<GameShortInfo> = listOf<GameShortInfo>(),
     gridScrollState: LazyGridState = rememberLazyGridState(),
-    onLoadMore: () -> Unit
+    onLoadMore: () -> Unit,
+    navigateToGame: (GameShortInfo) -> Unit = {},
 ) {
 
     val shouldLoadMore by remember {
         derivedStateOf {
             val info = gridScrollState.layoutInfo
-            val lastVisibleIndex =
-                info.visibleItemsInfo.lastOrNull()?.index ?: -1
+            val lastVisibleIndex = info.visibleItemsInfo.lastOrNull()?.index ?: -1
 
             lastVisibleIndex >= info.totalItemsCount - 4
         }
@@ -117,17 +112,18 @@ fun GamesGrid(
         state = gridScrollState,
         contentPadding = contentPadding
     ) {
-        itemsIndexed(
-            items = games,
-            key = { _, game ->
-                "game-id-${game.gameId}"
-            },
-            contentType = { _, game ->
-                "game"
-            }
-        ) { index, item ->
+        itemsIndexed(items = games, key = { _, game ->
+            "game-id-${game.gameId}"
+        }, contentType = { _, game ->
+            "game"
+        }) { index, item ->
             Card(
-                game = item
+                game = item,
+                onClick = {
+                    if(item.dealId != null){
+                        navigateToGame(item)
+                    }
+                }
             )
         }
     }

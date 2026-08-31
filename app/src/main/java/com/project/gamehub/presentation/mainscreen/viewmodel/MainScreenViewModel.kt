@@ -81,7 +81,6 @@ class MainScreenViewModel @Inject constructor(
                         }
                     }
                 }
-                // TODO обработать ошибки
                 Log.e(TAG, "getGames exception: ${result.exceptionOrNull()?.message}")
             }
         }

@@ -1,10 +1,16 @@
 package com.project.gamehub.di.remote
 
 import com.project.gamehub.BuildConfig
+import com.project.gamehub.data.remote.GameInfoAPI
 import com.project.gamehub.data.remote.GamesAPI
-import com.project.gamehub.data.remote.api.GamesAPIRetrofit
-import com.project.gamehub.data.remote.datasource.RetrofitDataSource
+import com.project.gamehub.data.remote.api.CheapSharkAPIRetrofit
+import com.project.gamehub.data.remote.api.SteamAPIRetrofit
+import com.project.gamehub.data.remote.datasource.RetrofitCheapSharkDataSource
+import com.project.gamehub.data.remote.datasource.RetrofitSteamDataSource
 import com.project.gamehub.data.repository.GameRepositoryImpl
+import com.project.gamehub.di.annotations.CheapSharkHttpClient
+import com.project.gamehub.di.annotations.CheapSharkRetrofit
+import com.project.gamehub.di.annotations.SteamRetrofit
 import com.project.gamehub.domain.repository.GameRepository
 import dagger.Binds
 import dagger.Module
@@ -33,7 +39,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideHttpClient(): OkHttpClient = OkHttpClient.Builder()
+    @CheapSharkHttpClient
+    fun provideCheapSharkHttpClient(): OkHttpClient = OkHttpClient.Builder()
         .addInterceptor { chain ->
             val request = chain.request()
                 .newBuilder()
@@ -46,12 +53,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideRetrofit(
-        client: OkHttpClient,
+    @CheapSharkRetrofit
+    fun provideCheapSharkRetrofit(
+        @CheapSharkHttpClient client: OkHttpClient,
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.gamebrain_api_url)
+            .baseUrl(BuildConfig.cheapSharkApiUrl)
             .client(client)
             .addConverterFactory(
                 json.asConverterFactory(
@@ -63,10 +71,34 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    @SteamRetrofit
+    fun provideSteamRetrofit(
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.steamApiUrl)
+            .addConverterFactory(
+                json.asConverterFactory(
+                    "application/json".toMediaType()
+                )
+            )
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideGamesApi(
-        retrofit: Retrofit
-    ): GamesAPIRetrofit {
-        return retrofit.create(GamesAPIRetrofit::class.java)
+        @CheapSharkRetrofit retrofit: Retrofit
+    ): CheapSharkAPIRetrofit {
+        return retrofit.create(CheapSharkAPIRetrofit::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSteamApi(
+        @SteamRetrofit retrofit: Retrofit
+    ): SteamAPIRetrofit {
+        return retrofit.create(SteamAPIRetrofit::class.java)
     }
 
 
@@ -77,11 +109,17 @@ object NetworkModule {
 abstract class NetworkAbstractModule {
     @Binds
     abstract fun bindGamesAPIImpl(
-        impl: RetrofitDataSource
+        impl: RetrofitCheapSharkDataSource
     ): GamesAPI
+
+    @Binds
+    abstract fun bindGameAPIImpl(
+        impl: RetrofitSteamDataSource
+    ): GameInfoAPI
 
     @Binds
     abstract fun bindGamesRepo(
         impl: GameRepositoryImpl
     ): GameRepository
+
 }

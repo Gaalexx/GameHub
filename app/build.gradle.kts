@@ -15,11 +15,9 @@ val localProperties = Properties().apply {
     }
 }
 
-val gameBrainApiKey =
-    localProperties.getProperty("api_key") ?: ""
+val cheapSharkApiUrl = localProperties.getProperty("cheapshark_api_url") ?: ""
 
-val gameBrainApiUrl =
-    localProperties.getProperty("api_url") ?: ""
+val steamApiUrl = localProperties.getProperty("steam_api_url") ?: ""
 
 android {
     namespace = "com.project.gamehub"
@@ -35,16 +33,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
-            "String",
-            "gamebrain_api_url",
-            "\"$gameBrainApiUrl\""
+            "String", "cheapSharkApiUrl", "\"$cheapSharkApiUrl\""
         )
 
         buildConfigField(
-            "String",
-            "gamebrain_api_key",
-            "\"$gameBrainApiKey\""
+            "String", "steamApiUrl", "\"$steamApiUrl\""
         )
+
     }
 
     buildTypes {

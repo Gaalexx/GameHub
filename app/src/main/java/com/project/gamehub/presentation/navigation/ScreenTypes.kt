@@ -1,15 +1,20 @@
 package com.project.gamehub.presentation.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.project.gamehub.domain.model.GameShortInfo
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class ScreenTypes : NavKey
-{
+sealed class ScreenTypes : NavKey {
+    sealed interface BottomBarNavigatable
+
     @Serializable
-    data object MainScreen : ScreenTypes()
+    data object MainScreen : ScreenTypes(), BottomBarNavigatable
+
     @Serializable
-    data class GameReview(val gameUri: String) : ScreenTypes()
+    data object MyLibrary : ScreenTypes(), BottomBarNavigatable
+
     @Serializable
-    data object MyLibrary : ScreenTypes()
+    data class GameReview(val game: GameShortInfo) : ScreenTypes()
+
 }

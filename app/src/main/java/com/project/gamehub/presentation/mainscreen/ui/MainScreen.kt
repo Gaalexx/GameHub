@@ -39,10 +39,13 @@ import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenEvent
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelCommand
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelError
+import com.project.gamehub.presentation.shared.ConnectionErrorScreen
+import com.project.gamehub.presentation.shared.UnknownErrorScreen
 import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
 fun MainScreenRoot(
+    navigateToGame: (GameShortInfo) -> Unit = {},
     mainScreenViewModel: MainScreenViewModel = hiltViewModel()
 ) {
 
@@ -68,13 +71,15 @@ fun MainScreenRoot(
     }
 
     MainScreen(
-        mainViewModelState = state, onEvent = onEvent
+        mainViewModelState = state, onEvent = onEvent, navigateToGame = navigateToGame
     )
 }
 
 @Composable
 fun MainScreen(
-    mainViewModelState: MainScreenViewModelState, onEvent: (MainScreenViewModelCommand) -> Unit
+    mainViewModelState: MainScreenViewModelState,
+    onEvent: (MainScreenViewModelCommand) -> Unit,
+    navigateToGame: (GameShortInfo) -> Unit = {},
 ) {
 
     var query by remember { mutableStateOf<String>("") }
@@ -84,7 +89,7 @@ fun MainScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = MaterialTheme.colorScheme.secondary)
+            .background(color = MaterialTheme.colorScheme.surface)
     ) {
 
         when (mainViewModelState.error) {
@@ -95,7 +100,9 @@ fun MainScreen(
                     games = mainViewModelState.gamesList,
                     onLoadMore = {
                         onEvent(MainScreenViewModelCommand.GetGames)
-                    })
+                    },
+                    navigateToGame = navigateToGame
+                )
 
 
                 TextField(
@@ -121,19 +128,17 @@ fun MainScreen(
             }
 
             is MainScreenViewModelError.NoInternet -> {
-                RetryHolder(
+                ConnectionErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    whyRetry = stringResource(R.string.error),
-                    whatReason = stringResource(R.string.no_internet_error),
-                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) })
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
             }
 
             is MainScreenViewModelError.Unknown -> {
-                RetryHolder(
+                UnknownErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    whyRetry = stringResource(R.string.error),
-                    whatReason = stringResource(R.string.unknown_error),
-                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) })
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
             }
         }
 
