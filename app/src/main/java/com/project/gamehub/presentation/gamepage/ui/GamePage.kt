@@ -2,6 +2,7 @@ package com.project.gamehub.presentation.gamepage.ui
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -66,12 +67,17 @@ fun GamePageRoot(
     GamePage(
         state = state,
         onBack = onBack,
-        onRetry = { onEvent(GamePageViewModelCommand.LoadGameInfo(game.dealId!!)) })
+        onRetry = { onEvent(GamePageViewModelCommand.LoadGameInfo(game.dealId!!)) },
+        onEvent = onEvent
+    )
 }
 
 @Composable
 fun GamePage(
-    state: GamePageViewModelState, onBack: () -> Unit = {}, onRetry: () -> Unit,
+    state: GamePageViewModelState,
+    onEvent: (GamePageViewModelCommand) -> Unit = {},
+    onBack: () -> Unit = {},
+    onRetry: () -> Unit = {},
 ) {
 
     val scrollState = rememberScrollState(0)
@@ -129,18 +135,27 @@ fun GamePage(
                                 .aspectRatio(1f)
                                 .fillMaxHeight()
                         ) {
-                            Icon(
-                                modifier = Modifier
-                                    .fillMaxSize(0.65f)
-                                    .align(Alignment.Center),
-                                imageVector = if (state.isInLibrary) Icons.Default.Star else Icons.Default.StarOutline,
-                                tint = if (state.isInLibrary) {
-                                    MaterialTheme.colorScheme.tertiary
-                                } else {
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                },
-                                contentDescription = "Star"
-                            )
+                            if (!state.isLoading) {
+                                Icon(
+                                    modifier = Modifier
+                                        .fillMaxSize(0.65f)
+                                        .align(Alignment.Center)
+                                        .clickable {
+                                            if (state.isInLibrary) {
+                                                onEvent(GamePageViewModelCommand.DeleteGame)
+                                            } else {
+                                                onEvent(GamePageViewModelCommand.SaveGame)
+                                            }
+                                        },
+                                    imageVector = if (state.isInLibrary) Icons.Default.Star else Icons.Default.StarOutline,
+                                    tint = if (state.isInLibrary) {
+                                        MaterialTheme.colorScheme.tertiary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    },
+                                    contentDescription = "Star"
+                                )
+                            }
                         }
                     }
 
@@ -233,13 +248,13 @@ private fun GamePagePreview() {
     GameHubTheme {
         GamePage(
             state = GamePageViewModelState(
-            "game",
-            null,
-            "5.0",
-            "1000",
-            "Description of the game. Game is insanely interesting",
-            true,
-            false
-        ), {}, {})
+                "game",
+                null,
+                "5.0",
+                "1000",
+                "Description of the game. Game is insanely interesting",
+                true,
+                false
+            ), {}, {})
     }
 }

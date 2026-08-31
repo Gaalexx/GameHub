@@ -12,9 +12,18 @@ interface SavedGamesDao {
     @Query("SELECT * FROM saved_games")
     fun getGames(): Flow<List<GameEntity>>
 
+    @Query("SELECT * FROM saved_games WHERE steamId = :id")
+    suspend fun getGameBySteamId(id: String): GameEntity?
+
+    @Query("SELECT * FROM saved_games WHERE dealId = :id")
+    suspend fun getGameByDealId(id: String): GameEntity?
+
     @Insert
     suspend fun insert(game: GameEntity)
 
     @Delete
     suspend fun delete(game: GameEntity)
+
+    @Query("DELETE FROM saved_games WHERE steamId = :id")
+    suspend fun deleteBySteamId(id: String)
 }

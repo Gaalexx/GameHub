@@ -14,6 +14,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.project.gamehub.presentation.gamepage.ui.GamePageRoot
 import com.project.gamehub.presentation.library.ui.Library
+import com.project.gamehub.presentation.library.ui.LibraryRoot
 import com.project.gamehub.presentation.mainscreen.ui.MainScreenRoot
 
 @Composable
@@ -27,7 +28,11 @@ fun AppNavigation() {
                 })
         }
         entry<ScreenTypes.MyLibrary> {
-            Library()
+            LibraryRoot(
+                navigateToGame = { it ->
+                    navBackStack.add(ScreenTypes.GameReview(it))
+                }
+            )
         }
         entry<ScreenTypes.GameReview> { it ->
             GamePageRoot(game = it.game, onBack = { navBackStack.removeLastOrNull() })

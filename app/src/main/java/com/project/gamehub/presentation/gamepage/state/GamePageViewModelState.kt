@@ -13,5 +13,7 @@ data class GamePageViewModelState(
     val description: String = "",
     val isInLibrary: Boolean = false,
     val isLoading: Boolean = true,
-    val errorState: GamePageViewModelError = GamePageViewModelError.NoError
+    val errorState: GamePageViewModelError = GamePageViewModelError.NoError,
+    val steamId: String = "",
+    val dealId: String = ""
 )
