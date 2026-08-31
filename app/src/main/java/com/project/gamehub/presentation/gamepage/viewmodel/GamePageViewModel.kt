@@ -5,11 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.gamehub.domain.repository.GameRepository
 import com.project.gamehub.presentation.gamepage.state.GamePageViewModelState
+import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenEvent
+import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelError
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,7 +33,8 @@ class GamePageViewModel @Inject constructor(
 
             _state.update {
                 it.copy(
-                    isLoading = true
+                    isLoading = true,
+                    errorState = GamePageViewModelError.NoError
                 )
             }
 
@@ -45,13 +49,28 @@ class GamePageViewModel @Inject constructor(
                         rating = infoGot.rating,
                         price = infoGot.price,
                         description = infoGot.description,
-                        isLoading = false
+                        isLoading = false,
+                        errorState = GamePageViewModelError.NoError
                     )
                 }
             }
             else{
-                Log.e("GAME LOAD", info.exceptionOrNull()!!.message.toString())
-                // TODO обработать ошибку
+                when(info.exceptionOrNull()){
+                    is UnknownHostException -> {
+                        _state.update {
+                            it.copy(
+                                errorState = GamePageViewModelError.NoInternet
+                            )
+                        }
+                    }
+                    else -> {
+                        _state.update {
+                            it.copy(
+                                errorState = GamePageViewModelError.Unknown
+                            )
+                        }
+                    }
+                }
             }
         }
     }

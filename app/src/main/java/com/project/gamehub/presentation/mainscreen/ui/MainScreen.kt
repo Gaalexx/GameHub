@@ -39,6 +39,8 @@ import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenEvent
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelCommand
 import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModelError
+import com.project.gamehub.presentation.shared.ConnectionErrorScreen
+import com.project.gamehub.presentation.shared.UnknownErrorScreen
 import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
@@ -126,19 +128,17 @@ fun MainScreen(
             }
 
             is MainScreenViewModelError.NoInternet -> {
-                RetryHolder(
+                ConnectionErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    whyRetry = stringResource(R.string.error),
-                    whatReason = stringResource(R.string.no_internet_error),
-                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) })
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
             }
 
             is MainScreenViewModelError.Unknown -> {
-                RetryHolder(
+                UnknownErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    whyRetry = stringResource(R.string.error),
-                    whatReason = stringResource(R.string.unknown_error),
-                    onRetry = { onEvent(MainScreenViewModelCommand.GetGames) })
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
+                )
             }
         }
 

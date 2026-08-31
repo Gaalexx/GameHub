@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,13 +46,14 @@ import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.presentation.gamepage.state.GamePageViewModelState
 import com.project.gamehub.presentation.gamepage.viewmodel.GamePageViewModel
 import com.project.gamehub.presentation.gamepage.viewmodel.GamePageViewModelCommand
+import com.project.gamehub.presentation.gamepage.viewmodel.GamePageViewModelError
+import com.project.gamehub.presentation.shared.ConnectionErrorScreen
+import com.project.gamehub.presentation.shared.UnknownErrorScreen
 import com.project.gamehub.presentation.theme.GameHubTheme
 
 @Composable
 fun GamePageRoot(
-    game: GameShortInfo,
-    onBack: () -> Unit,
-    viewModel: GamePageViewModel = hiltViewModel()
+    game: GameShortInfo, onBack: () -> Unit, viewModel: GamePageViewModel = hiltViewModel()
 ) {
 
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -63,12 +63,15 @@ fun GamePageRoot(
         onEvent(GamePageViewModelCommand.LoadGameInfo(game.dealId!!))
     }
 
-    GamePage(state = state, onBack = onBack)
+    GamePage(
+        state = state,
+        onBack = onBack,
+        onRetry = { onEvent(GamePageViewModelCommand.LoadGameInfo(game.dealId!!)) })
 }
 
 @Composable
 fun GamePage(
-    state: GamePageViewModelState, onBack: () -> Unit = {}
+    state: GamePageViewModelState, onBack: () -> Unit = {}, onRetry: () -> Unit,
 ) {
 
     val scrollState = rememberScrollState(0)
@@ -79,130 +82,148 @@ fun GamePage(
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.surface)
     )
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding(),
-        color = MaterialTheme.colorScheme.surface,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .scrollable(
-                    scrollState,
-                    orientation = Orientation.Vertical
-                )
-        ) {
-            Row(
+
+    when (state.errorState) {
+        is GamePageViewModelError.NoError -> {
+            Surface(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.1f),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .systemBarsPadding(),
+                color = MaterialTheme.colorScheme.surface,
             ) {
-                Box(
+                Column(
                     modifier = Modifier
-                        .aspectRatio(1f)
-                        .fillMaxHeight()
-                ) {
-                    FilledTonalIconButton(
-                        modifier = Modifier
-                            .fillMaxSize(0.75f)
-                            .aspectRatio(1f)
-                            .align(Alignment.Center),
-                        onClick = onBack,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back",
+                        .fillMaxSize()
+                        .scrollable(
+                            scrollState, orientation = Orientation.Vertical
                         )
-                    }
-                }
-                Spacer(Modifier.weight(1f))
-
-                Box(
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .fillMaxHeight()
                 ) {
-                    Icon(
-                        modifier = Modifier
-                            .fillMaxSize(0.65f)
-                            .align(Alignment.Center),
-                        imageVector = if (state.isInLibrary) Icons.Default.Star else Icons.Default.StarOutline,
-                        tint = if (state.isInLibrary) {
-                            MaterialTheme.colorScheme.tertiary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        contentDescription = "Star"
-                    )
-                }
-            }
-
-            if (state.isLoading) {
-                Box(modifier = Modifier.fillMaxSize()){
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-
-            } else {
-                Text(
-                    modifier = Modifier.padding(5.dp),
-                    text = state.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                if (state.photoUrl != null) {
-                    Box(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(5.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(color = MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .fillMaxHeight(0.1f),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AsyncImage(
-                            modifier = Modifier.fillMaxWidth(),
-                            model = state.photoUrl,
-                            contentDescription = "Game photo",
-                            contentScale = ContentScale.FillWidth,
-                            onError = { it ->
-                                Log.e("IMAGE", "ERROR ${it.result.throwable.message}")
-                            })
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .fillMaxHeight()
+                        ) {
+                            FilledTonalIconButton(
+                                modifier = Modifier
+                                    .fillMaxSize(0.75f)
+                                    .aspectRatio(1f)
+                                    .align(Alignment.Center),
+                                onClick = onBack,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowBackIosNew,
+                                    contentDescription = "Back",
+                                )
+                            }
+                        }
+                        Spacer(Modifier.weight(1f))
+
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .fillMaxHeight()
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .fillMaxSize(0.65f)
+                                    .align(Alignment.Center),
+                                imageVector = if (state.isInLibrary) Icons.Default.Star else Icons.Default.StarOutline,
+                                tint = if (state.isInLibrary) {
+                                    MaterialTheme.colorScheme.tertiary
+                                } else {
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                                },
+                                contentDescription = "Star"
+                            )
+                        }
                     }
-                    Spacer(Modifier.padding(5.dp))
-                }
 
-                Row {
-                    Text(
-                        modifier = descTextModifier.weight(1f),
-                        text = stringResource(R.string.rating, state.rating),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                    Text(
-                        modifier = descTextModifier.weight(1f),
-                        text = stringResource(R.string.price, state.price),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
-                Text(
-                    modifier = descTextModifier,
-                    text = stringResource(R.string.description),
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    modifier = descTextModifier,
-                    text = state.description,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        textIndent = TextIndent(
-                            firstLine =  24.sp
+                    if (state.isLoading) {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                        }
+
+                    } else {
+                        Text(
+                            modifier = Modifier.padding(5.dp),
+                            text = state.name,
+                            style = MaterialTheme.typography.headlineSmall,
                         )
-                    ),
-                )
+                        if (state.photoUrl != null) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp)
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(color = MaterialTheme.colorScheme.surfaceContainerHighest)
+                            ) {
+                                AsyncImage(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    model = state.photoUrl,
+                                    contentDescription = "Game photo",
+                                    contentScale = ContentScale.FillWidth,
+                                    onError = { it ->
+                                        Log.e("IMAGE", "ERROR ${it.result.throwable.message}")
+                                    })
+                            }
+                            Spacer(Modifier.padding(5.dp))
+                        }
+
+                        Row {
+                            Text(
+                                modifier = descTextModifier.weight(1f),
+                                text = stringResource(R.string.rating, state.rating),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                            Text(
+                                modifier = descTextModifier.weight(1f),
+                                text = stringResource(R.string.price, state.price),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                        }
+                        Text(
+                            modifier = descTextModifier,
+                            text = stringResource(R.string.description),
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            modifier = descTextModifier,
+                            text = state.description,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                textIndent = TextIndent(
+                                    firstLine = 24.sp
+                                )
+                            ),
+                        )
 
 
+                    }
+
+                }
             }
+        }
 
+        is GamePageViewModelError.NoInternet -> {
+            ConnectionErrorScreen(
+                modifier = Modifier.fillMaxSize(), onClick = onRetry
+            )
+        }
+
+        is GamePageViewModelError.Unknown -> {
+            UnknownErrorScreen(
+                modifier = Modifier.fillMaxSize(), onClick = onRetry
+            )
         }
     }
+
+
 }
 
 
@@ -212,14 +233,13 @@ private fun GamePagePreview() {
     GameHubTheme {
         GamePage(
             state = GamePageViewModelState(
-                "game",
-                null,
-                "5.0",
-                "1000",
-                "Description of the game. Game is insanely interesting",
-                true,
-                false
-            )
-        )
+            "game",
+            null,
+            "5.0",
+            "1000",
+            "Description of the game. Game is insanely interesting",
+            true,
+            false
+        ), {}, {})
     }
 }
