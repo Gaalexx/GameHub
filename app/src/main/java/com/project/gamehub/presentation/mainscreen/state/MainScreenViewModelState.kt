@@ -8,5 +8,7 @@ import com.project.gamehub.presentation.mainscreen.viewmodel.MainScreenViewModel
 data class MainScreenViewModelState(
     val gamesList: List<GameShortInfo>,
     val pages: Int = 0,
+    val searched: List<GameShortInfo> = emptyList(),
+    val query: String = "",
     val error: MainScreenViewModelError = MainScreenViewModelError.NoError
 )

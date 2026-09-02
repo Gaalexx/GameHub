@@ -22,4 +22,8 @@ class RetrofitCheapSharkDataSource @Inject constructor(
     override suspend fun getGame(id: String): DealDetailsDTO {
         return api.getDeal(id)
     }
+
+    override suspend fun getGamesByName(name: String): List<GameDTO> {
+        return api.getGamesByName(name)
+    }
 }
