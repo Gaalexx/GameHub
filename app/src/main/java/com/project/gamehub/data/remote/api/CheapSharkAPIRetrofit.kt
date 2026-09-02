@@ -13,6 +13,12 @@ interface CheapSharkAPIRetrofit {
     ): List<GameDTO>
 
     @GET("deals")
+    suspend fun getGamesByName(
+        @Query("title") name: String,
+        @Query("pageSize") limit: Int = 20
+    ): List<GameDTO>
+
+    @GET("deals")
     suspend fun getDeal(
         @Query("id", encoded = true) dealId: String
     ): DealDetailsDTO

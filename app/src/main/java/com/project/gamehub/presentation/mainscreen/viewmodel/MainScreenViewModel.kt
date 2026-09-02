@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.gamehub.domain.model.GameShortInfo
 import com.project.gamehub.domain.repository.GameRepository
+import com.project.gamehub.presentation.mainscreen.searchdelegate.SearchDelegate
 import com.project.gamehub.presentation.mainscreen.state.MainScreenViewModelState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
@@ -19,32 +20,69 @@ import java.net.UnknownHostException
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     private val repo: GameRepository
-) : ViewModel(){
-    companion object{
+) : ViewModel() {
+    companion object {
         const val TAG = "MainScreenViewModel"
     }
+
     private val usedGameIds: HashSet<String> = HashSet()
-    private val _state = MutableStateFlow<MainScreenViewModelState>(MainScreenViewModelState(gamesList = emptyList()))
+    private val _state =
+        MutableStateFlow<MainScreenViewModelState>(MainScreenViewModelState(gamesList = emptyList()))
     val state = _state.asStateFlow()
+
+    private val searchDelegate = SearchDelegate(repo, viewModelScope)
     private val _event = MutableSharedFlow<MainScreenEvent>()
     val event = _event.asSharedFlow()
 
-    fun onEvent(event: MainScreenViewModelCommand){
-        when(event){
-            is MainScreenViewModelCommand.GetGames -> getGames()
+    init {
+        viewModelScope.launch {
+            searchDelegate.results.collect { found ->
+                if(found != null){
+                    _state.update {
+                        it.copy(
+                            searched = found
+                        )
+                    }
+                }
+                else{
+                    _state.update {
+                        it.copy(
+                            searched = emptyList()
+                        )
+                    }
+                }
+            }
         }
     }
 
-    private fun getGames(){
+    fun onEvent(event: MainScreenViewModelCommand) {
+        when (event) {
+            is MainScreenViewModelCommand.GetGames -> getGames()
+            is MainScreenViewModelCommand.OnQueryChange -> queryChanged(event.query)
+        }
+    }
+
+    private fun queryChanged(query: String){
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    query = query
+                )
+            }
+            searchDelegate.onQueryChange(query)
+        }
+    }
+
+    private fun getGames() {
         viewModelScope.launch {
             val result = repo.getGames(_state.value.pages + 1)
 
-            if(result.isSuccess){
+            if (result.isSuccess) {
                 val games = result.getOrNull()
 
-                val list: List<GameShortInfo> = buildList{
+                val list: List<GameShortInfo> = buildList {
                     games?.forEach { it ->
-                        if(it.gameId !in usedGameIds){
+                        if (it.gameId !in usedGameIds) {
                             usedGameIds.add(it.gameId)
                             add(it)
                         }
@@ -58,14 +96,12 @@ class MainScreenViewModel @Inject constructor(
                         error = MainScreenViewModelError.NoError
                     )
                 }
-            }
-            else{
-                when(result.exceptionOrNull()){
+            } else {
+                when (result.exceptionOrNull()) {
                     is UnknownHostException -> {
-                        if(_state.value.gamesList.isNotEmpty()){
+                        if (_state.value.gamesList.isNotEmpty()) {
                             _event.emit(MainScreenEvent.NoInternetToast)
-                        }
-                        else{
+                        } else {
                             _state.update {
                                 it.copy(
                                     error = MainScreenViewModelError.NoInternet
@@ -73,6 +109,7 @@ class MainScreenViewModel @Inject constructor(
                             }
                         }
                     }
+
                     else -> {
                         _state.update {
                             it.copy(

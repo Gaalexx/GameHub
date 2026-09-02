@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface GameRepository {
     suspend fun getGames(page: Int): Result<List<GameShortInfo>>
     suspend fun getGame(id: String): Result<GameFullInfo>
+    suspend fun findGame(name: String): Result<List<GameShortInfo>>
     suspend fun getSavedGamesFull(): Flow<List<GameFullInfo>>
     suspend fun observeSavedGamesShort(): Flow<List<GameShortInfo>>
     suspend fun getSavedGameByDealId(dealId: String): GameFullInfo?

@@ -98,7 +98,7 @@ fun MainScreen(
                 GamesGrid(
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(top = searchBarBottom),
-                    games = mainViewModelState.gamesList,
+                    games = if (mainViewModelState.searched == emptyList<GameShortInfo>() || mainViewModelState.query == "") mainViewModelState.gamesList else mainViewModelState.searched,
                     onLoadMore = {
                         onEvent(MainScreenViewModelCommand.GetGames)
                     },
@@ -107,8 +107,10 @@ fun MainScreen(
 
 
                 TextField(
-                    value = query,
-                    onValueChange = { query = it },
+                    value = mainViewModelState.query,
+                    onValueChange = {
+                        onEvent(MainScreenViewModelCommand.OnQueryChange(it))
+                    },
                     label = { Text(stringResource(R.string.input_game)) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -131,15 +133,13 @@ fun MainScreen(
             is MainScreenViewModelError.NoInternet -> {
                 ConnectionErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
-                )
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) })
             }
 
             is MainScreenViewModelError.Unknown -> {
                 UnknownErrorScreen(
                     modifier = Modifier.fillMaxSize(),
-                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) }
-                )
+                    onClick = { onEvent(MainScreenViewModelCommand.GetGames) })
             }
         }
 

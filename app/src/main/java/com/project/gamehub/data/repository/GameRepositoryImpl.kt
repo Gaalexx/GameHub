@@ -80,6 +80,31 @@ class GameRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun findGame(name: String): Result<List<GameShortInfo>> {
+        try {
+            val res = api.getGamesByName(name)
+            return Result.success(buildList {
+                res.forEach { it ->
+                    if (it.steamAppId != null) {
+                        add(
+                            GameShortInfo(
+                                gameId = it.steamAppId,
+                                name = it.title,
+                                photoUrl = it.photoUrl,
+                                dealId = it.dealId
+                            )
+                        )
+                    }
+                }
+            })
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return Result.failure(e)
+        }
+
+    }
+
 
     override suspend fun getSavedGamesFull(): Flow<List<GameFullInfo>> {
         return savedGames.getGames().map { it ->
